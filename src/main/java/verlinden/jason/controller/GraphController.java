@@ -11,13 +11,17 @@ import javax.validation.Valid;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.servlet.ModelAndView;
 
 import verlinden.jason.airport.DenverAirport;
 import verlinden.jason.model.FormInput;
+import verlinden.jason.model.PathsResponseJson;
 
 @Controller
 @RequestMapping("/graph")
@@ -56,6 +60,13 @@ public class GraphController {
 		result.addObject("userName", formInput.getUserName());
 		
 		return result;
+	}
+	
+	@RequestMapping(value = "findPaths", method = RequestMethod.GET)
+	public @ResponseBody PathsResponseJson getPathsInJSON(@RequestParam("userName") String userName, @RequestParam("fileId") String fileId) {
+		PathsResponseJson resp = new PathsResponseJson(userName, getShortestPaths(fileId));
+		
+		return resp;
 	}
 	
 	private List<String> getShortestPaths(String testFile) {
