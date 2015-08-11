@@ -8,10 +8,10 @@ import java.util.List;
 
 import javax.validation.Valid;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -20,8 +20,10 @@ import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.servlet.ModelAndView;
 
 import verlinden.jason.airport.DenverAirport;
+import verlinden.jason.entity.LogEntry;
 import verlinden.jason.model.FormInput;
 import verlinden.jason.model.PathsResponseJson;
+import verlinden.jason.repository.LogEntryRepository;
 
 @Controller
 @RequestMapping("/graph")
@@ -32,6 +34,9 @@ public class GraphController {
 	private final int CONVEYER_COLUMN_COUNT = 3;
 	private final int DEPARTURE_COLUMN_COUNT = 4;
 	private final int LUGGAGE_COLUMN_COUNT = 3;
+	
+	@Autowired
+	private LogEntryRepository repository;
 
 	@RequestMapping("test")
 	public ModelAndView test() {
@@ -55,6 +60,9 @@ public class GraphController {
             return new ModelAndView("/");
         }
 		
+		// Save log entry to mongo
+		repository.save(new LogEntry(formInput.getUserName(), formInput.getFileId()));
+		
 		ModelAndView result = new ModelAndView("/graph/results");
 		result.addObject("routes", getShortestPaths(formInput.getFileId()));
 		result.addObject("userName", formInput.getUserName());
@@ -64,6 +72,9 @@ public class GraphController {
 	
 	@RequestMapping(value = "findPaths", method = RequestMethod.GET)
 	public @ResponseBody PathsResponseJson getPathsInJSON(@RequestParam("userName") String userName, @RequestParam("fileId") String fileId) {
+		// Save log entry to mongo
+		repository.save(new LogEntry(userName, fileId));
+		
 		PathsResponseJson resp = new PathsResponseJson(userName, getShortestPaths(fileId));
 		
 		return resp;

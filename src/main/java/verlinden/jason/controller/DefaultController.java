@@ -14,7 +14,7 @@ import verlinden.jason.model.TestDataFileOption;
 
 @Controller
 @RequestMapping("/")
-public class DefaultController {
+public class DefaultController {	
 	
 	@RequestMapping(method = RequestMethod.GET)
 	protected ModelAndView initForm(Model model) {
